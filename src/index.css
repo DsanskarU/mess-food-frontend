@@ -1,0 +1,33 @@
+.text-orange {
+  color: #ff7a00;
+}
+
+.menu-card {
+  background-color: #fff8f0; /* light cream */
+  border: 1px solid #ffe0c2;
+}
+
+.app-bg {
+  background: linear-gradient(135deg, #FFD194, #D1913C);
+  min-height: 100vh;
+}
+
+/*for navbar*/
+/* Gradient navbar: red -> orange */
+.navbar-custom {
+  background: linear-gradient(90deg, #e53935, #fb8c00);
+}
+
+.navbar-custom .nav-link,
+.navbar-custom .navbar-brand {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #fff3e0 !important;
+}
+
+.navbar-custom .navbar-toggler-icon {
+  filter: invert(1); /* makes hamburger icon visible on gradient */
+}
