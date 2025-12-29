@@ -8,22 +8,20 @@ const Navbar = () => {
     const [user, setUser] = useState(null)
     const navigate = useNavigate()
 
-    const tokenUser = getUserFromToken()
-
+    
     useEffect(() => {
         const token = localStorage.getItem("token")
         setIsLoggedIn(!!token)
 
-        if (tokenUser?.id) {
-            getUserById(tokenUser.id)
-                .then(res => {
-                    setUser(res.data)
-                })
-                .catch(err => {
-                    console.error("Error loading user", err)
-                })
+        const userFromToken = getUserFromToken(); // compute inside effect
+
+        if (userFromToken?.id) {
+            getUserById(userFromToken.id)
+                .then(res => setUser(res.data))
+                .catch(err => console.error("Error loading user", err))
         }
-    }, [tokenUser])
+    }, [])  // <-- empty dependency array
+
 
     const handleLogout = (e) => {
         e.preventDefault()
