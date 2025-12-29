@@ -7,20 +7,21 @@ const Register = () => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        password: ""
+        password: "",
+        role: ""
     });
 
-    const [error,setError] = useState("");
+    const [error, setError] = useState("");
     const handelChange = (e) => {
-        setFormData({ ...formData,[e.target.name] : e.target.value});
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try{
+        try {
             const res = await signup(formData);
             navigate("/login");
-        }catch(err){
+        } catch (err) {
             setError(err.response?.data?.message || "login Failed");
         }
     }
@@ -67,6 +68,20 @@ const Register = () => {
                                         onChange={handelChange}
                                         required
                                     />
+                                </div>
+                                <div className='mb-3'>
+                                    <label className='from-label'>Role</label>
+                                    <select
+                                        className='form-select'
+                                        name='role'
+                                        value={formData.role}
+                                        onChange={handelChange}
+                                        required
+                                    >
+                                        <option value="STUDENT">STUDENT</option>
+                                        <option value="CHEF">CHEF</option>
+                                    </select>
+
                                 </div>
                                 <div className='d-flex gap-2'>
                                     <button type="submit" className="btn btn-primary w-50">
