@@ -19,10 +19,17 @@ const PreparedFood = () => {
     loadPreparedFoods();
   }, []);
 
+  // ✅ FIX DATA HERE (IMPORTANT)
   const loadVoteResults = async () => {
     try {
       const res = await getTodayVoteResult();
-      setFoods(res.data);
+
+      const fixedData = res.data.map((f) => ({
+        ...f,
+        is_veg: f.is_veg === true || f.is_veg === 1, // 🔥 FIX
+      }));
+
+      setFoods(fixedData);
     } catch {
       setError("Failed to load vote results");
     }
@@ -31,7 +38,10 @@ const PreparedFood = () => {
   const loadPreparedFoods = async () => {
     try {
       const res = await getTodayPreparedFood();
-      setPreparedIds(res.data.map((item) => Number(item.food_id)));
+
+      setPreparedIds(
+        res.data.map((item) => Number(item.food_id))
+      );
     } catch (err) {
       console.error(err);
     }
@@ -75,12 +85,10 @@ const PreparedFood = () => {
   const renderTable = (title, items) => (
     <div className="card mb-4 shadow-sm">
 
-      {/* HEADER */}
       <div className="card-header bg-dark text-white">
         <h5 className="mb-0">🍽 {title}</h5>
       </div>
 
-      {/* BODY */}
       <div className="card-body p-0">
 
         {items.length === 0 ? (
@@ -103,7 +111,6 @@ const PreparedFood = () => {
               </thead>
 
               <tbody>
-
                 {items.map((food) => {
                   const foodId = Number(food.food_id);
                   const isPrepared = preparedIds.includes(foodId);
@@ -111,32 +118,23 @@ const PreparedFood = () => {
                   return (
                     <tr key={foodId}>
 
-                      {/* FOOD NAME */}
                       <td className="fw-semibold">
                         {food.food_name}
                       </td>
 
-                      {/* TYPE */}
+                      {/* ✅ CLEAN FIX */}
                       <td>
-                        <span
-                          className={`badge ${
-                            food.is_veg === 1
-                              ? "bg-success"
-                              : "bg-danger"
-                          }`}
-                        >
-                          {food.is_veg === 1 ? "VEG" : "NON-VEG"}
+                        <span className={`badge ${food.is_veg ? "bg-success" : "bg-danger"}`}>
+                          {food.is_veg ? "VEG" : "NON-VEG"}
                         </span>
                       </td>
 
-                      {/* VOTES */}
                       <td className="text-center">
                         <span className="badge bg-primary">
                           {food.total_votes}
                         </span>
                       </td>
 
-                      {/* QUANTITY */}
                       <td>
                         <input
                           type="number"
@@ -154,7 +152,6 @@ const PreparedFood = () => {
                         />
                       </td>
 
-                      {/* ACTION */}
                       <td>
                         {!isPrepared ? (
                           <button
@@ -162,9 +159,7 @@ const PreparedFood = () => {
                             disabled={loadingId === foodId}
                             onClick={() => handlePrepare(food)}
                           >
-                            {loadingId === foodId
-                              ? "Adding..."
-                              : "Add"}
+                            {loadingId === foodId ? "Adding..." : "Add"}
                           </button>
                         ) : (
                           <button
@@ -180,7 +175,6 @@ const PreparedFood = () => {
                     </tr>
                   );
                 })}
-
               </tbody>
 
             </table>
@@ -189,27 +183,19 @@ const PreparedFood = () => {
         )}
 
       </div>
-
     </div>
   );
 
   return (
     <div className="container mt-4">
 
-      {/* TITLE */}
       <h3 className="text-center mb-4">
         🍱 Prepare Today’s Food
       </h3>
 
-      {/* ALERTS */}
-      {error && (
-        <div className="alert alert-danger">{error}</div>
-      )}
-      {success && (
-        <div className="alert alert-success">{success}</div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
 
-      {/* TABLES */}
       {renderTable(
         "Breakfast",
         foods.filter((f) => f.category === "BREAKFAST")
