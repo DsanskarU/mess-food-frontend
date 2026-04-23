@@ -1,87 +1,139 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from "react-router-dom"
-import { getUserFromToken } from '../api/getUserFromToken'
-import { getUserById } from '../api/userApi'
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { getUserFromToken } from "../api/getUserFromToken";
+import { getUserById } from "../api/userApi";
 
 const Navbar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [user, setUser] = useState(null)
-    const navigate = useNavigate()
+  const [user, setUser] = useState(null);
+  const [open, setOpen] = useState(false);
 
-    
-    useEffect(() => {
-        const token = localStorage.getItem("token")
-        setIsLoggedIn(!!token)
+  const navigate = useNavigate();
 
-        const userFromToken = getUserFromToken(); // compute inside effect
+  useEffect(() => {
+    const tokenUser = getUserFromToken();
 
-        if (userFromToken?.id) {
-            getUserById(userFromToken.id)
-                .then(res => setUser(res.data))
-                .catch(err => console.error("Error loading user", err))
-        }
-    }, [])  // <-- empty dependency array
-
-
-    const handleLogout = (e) => {
-        e.preventDefault()
-        localStorage.removeItem("token")
-        setIsLoggedIn(false)
-        setUser(null)
-        navigate("/")
+    if (tokenUser?.id) {
+      getUserById(tokenUser.id)
+        .then((res) => setUser(res.data))
+        .catch((err) => console.log(err));
     }
+  }, []);
 
-    return (
-        <nav className='navbar navbar-expand-lg navbar-custom'>
-            <div className='container'>
-                <Link className='navbar-brand' to="/">
-                    Mess अंन्ना
-                </Link>
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    window.location.href = "/login"; // 🔥 full reset
+  };
 
-                <div className='collapse navbar-collapse'>
-                    <ul className='navbar-nav ms-auto align-items-center'>
-                        <li className='nav-item'>
-                            <Link className='nav-link' to="/">Home</Link>
-                        </li>
+  // hide for chef
+  if (user?.role?.toLowerCase() === "chef") return null;
 
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/menu">Menu</Link>
-                        </li>
+  return (
+    <>
+      {/* TOP NAVBAR */}
+      <nav className="navbar navbar-dark navbar-custom px-3">
+        <Link className="navbar-brand" to="/">
+          Mess अंन्ना
+        </Link>
 
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/feedback">Feedback</Link>
-                        </li>
+        {/* HAMBURGER (mobile only) */}
+        <button
+          className="d-lg-none"
+          onClick={() => setOpen(true)}
+          style={{
+            fontSize: "26px",
+            background: "none",
+            border: "none",
+            color: "white",
+          }}
+        >
+          ☰
+        </button>
 
-                        {!isLoggedIn ? (
-                            <li className='nav-item ms-2'>
-                                <Link className='btn btn-warning' to="/login">
-                                    Login
-                                </Link>
-                            </li>
-                        ) : (
-                            <>
-                                {/* Student Name / Email */}
-                                {user && (
-                                    <li className="nav-item me-3 fw-bold text-white">
-                                        {user.name}
-                                    </li>
-                                )}
+        {/* DESKTOP MENU */}
+        <div className="d-none d-lg-flex align-items-center gap-3 ms-auto">
+          <Link className="nav-link text-white" to="/">Home</Link>
+          <Link className="nav-link text-white" to="/menu">Menu</Link>
+          <Link className="nav-link text-white" to="/feedback">Feedback</Link>
 
-                                <li className='nav-item'>
-                                    <button
-                                        className='btn btn-danger'
-                                        onClick={handleLogout}
-                                    >
-                                        Logout
-                                    </button>
-                                </li>
-                            </>
-                        )}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    )
-}
+          {!user ? (
+            <Link className="btn btn-warning" to="/login">Login</Link>
+          ) : (
+            <>
+              <span className="text-white fw-bold">{user.name}</span>
+              <button className="btn btn-danger" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
 
-export default Navbar
+      {/* BACKDROP */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 998,
+          }}
+        />
+      )}
+
+      {/* RIGHT SIDE SLIDE MENU */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100vh",
+          width: "260px",
+          backgroundColor: "#111827",
+          color: "white",
+          transform: open ? "translateX(0)" : "translateX(100%)",
+          transition: "0.3s ease",
+          zIndex: 999,
+          padding: "20px",
+        }}
+      >
+        <h4 className="mb-4">Menu</h4>
+
+        <Link to="/" onClick={() => setOpen(false)} className="d-block mb-3 text-white">
+          Home
+        </Link>
+
+        <Link to="/menu" onClick={() => setOpen(false)} className="d-block mb-3 text-white">
+          Menu
+        </Link>
+
+        <Link to="/feedback" onClick={() => setOpen(false)} className="d-block mb-3 text-white">
+          Feedback
+        </Link>
+
+        {!user ? (
+          <Link to="/login" onClick={() => setOpen(false)} className="btn btn-warning w-100 mt-3">
+            Login
+          </Link>
+        ) : (
+          <>
+            <div className="mt-3 mb-2 fw-bold">{user.name}</div>
+
+            <button
+              onClick={handleLogout}
+              className="btn btn-danger w-100"
+            >
+              Logout
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default Navbar;

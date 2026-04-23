@@ -17,7 +17,6 @@ const Menu = () => {
     fetchMyVotes();
   }, []);
 
-  // fetch menu
   const fetchMenu = async () => {
     try {
       const res = await getTodayMenu();
@@ -29,19 +28,16 @@ const Menu = () => {
     }
   };
 
-  // 🔥 fetch already voted foods
   const fetchMyVotes = async () => {
     try {
       const res = await getMyTodayVotes();
-      setVotedFood(res.data); // array of food_ids
-    } catch {
-      // user not logged in → ignore
-    }
+      setVotedFood(res.data);
+    } catch {}
   };
 
-  // vote handler
   const handleVote = async (food_id) => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       navigate("/login", {
         state: { message: "You must login to vote" },
@@ -53,13 +49,10 @@ const Menu = () => {
       await voteFood(food_id);
       setVotedFood((prev) => [...prev, food_id]);
     } catch (err) {
-      setVoteError(
-        err.response?.data?.message || "You already voted"
-      );
+      setVoteError(err.response?.data?.message || "You already voted");
     }
   };
 
-  // reusable section renderer
   const renderSection = (title, emoji, category) => (
     <>
       <h4 className="mt-4 mb-3 text-center">
@@ -73,7 +66,10 @@ const Menu = () => {
             const isVoted = votedFood.includes(item.food_id);
 
             return (
-              <div key={item.menu_id} className="col-md-4 mb-4 d-flex">
+              <div
+                key={item.menu_id}
+                className="col-12 col-sm-6 col-lg-4 mb-4 d-flex"
+              >
                 <div className="card h-100 w-100 shadow-sm">
                   <div className="card-body d-flex flex-column">
 
@@ -89,7 +85,7 @@ const Menu = () => {
                     </p>
 
                     <button
-                      className={`btn mt-auto ${
+                      className={`btn mt-auto w-100 ${
                         isVoted ? "btn-secondary" : "btn-warning"
                       }`}
                       disabled={isVoted}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTodayVoteResult } from "../api/voteApi"; // adjust path if needed
+import { getTodayVoteResult } from "../api/voteApi";
 
 const TodayVoteResult = () => {
   const [breakfast, setBreakfast] = useState([]);
@@ -16,9 +16,9 @@ const TodayVoteResult = () => {
       const res = await getTodayVoteResult();
       const data = res.data;
 
-      setBreakfast(data.filter(item => item.category === "BREAKFAST"));
-      setLunch(data.filter(item => item.category === "LUNCH"));
-      setDinner(data.filter(item => item.category === "DINNER"));
+      setBreakfast(data.filter((item) => item.category === "BREAKFAST"));
+      setLunch(data.filter((item) => item.category === "LUNCH"));
+      setDinner(data.filter((item) => item.category === "DINNER"));
     } catch (error) {
       console.error("Error fetching vote results", error);
     } finally {
@@ -26,47 +26,80 @@ const TodayVoteResult = () => {
     }
   };
 
-  const renderTable = (title, items) => (
+  const renderTable = (title, items, color) => (
     <div className="card mb-4 shadow-sm">
-      <div className="card-header bg-dark text-white">
-        <h5 className="mb-0">{title}</h5>
+
+      {/* HEADER */}
+      <div className={`card-header bg-${color} text-white`}>
+        <h5 className="mb-0">📊 {title}</h5>
       </div>
+
+      {/* BODY */}
       <div className="card-body p-0">
+
         {items.length === 0 ? (
-          <p className="text-center p-3">No votes found</p>
+          <p className="text-center p-3 mb-0 text-muted">
+            No votes found
+          </p>
         ) : (
-          <table className="table table-bordered table-striped mb-0">
-            <thead className="table-secondary">
-              <tr>
-                <th>Food Name</th>
-                <th>Total Votes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.food_name}</td>
-                  <td>{item.total_votes}</td>
+          <div className="table-responsive">
+
+            <table className="table table-bordered table-striped mb-0">
+
+              <thead className="table-light">
+                <tr>
+                  <th>Food Name</th>
+                  <th className="text-center">Total Votes</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={index}>
+                    <td className="fw-semibold">
+                      {item.food_name}
+                    </td>
+                    <td className="text-center">
+                      <span className="badge bg-primary">
+                        {item.total_votes}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
+
+          </div>
         )}
+
       </div>
+
     </div>
   );
 
   if (loading) {
-    return <div className="text-center mt-5">Loading...</div>;
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary"></div>
+        <p className="mt-2">Loading results...</p>
+      </div>
+    );
   }
 
   return (
     <div className="container mt-4">
-      <h2 className="text-center mb-4"> Today Vote Result</h2>
 
-      {renderTable("Breakfast", breakfast)}
-      {renderTable("Lunch", lunch)}
-      {renderTable("Dinner", dinner)}
+      {/* TITLE */}
+      <h2 className="text-center mb-4">
+        🗳 Today Vote Result
+      </h2>
+
+      {/* SECTIONS */}
+      {renderTable("Breakfast", breakfast, "warning")}
+      {renderTable("Lunch", lunch, "success")}
+      {renderTable("Dinner", dinner, "primary")}
+
     </div>
   );
 };

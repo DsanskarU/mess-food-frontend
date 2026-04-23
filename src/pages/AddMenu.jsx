@@ -45,8 +45,11 @@ const AddMenu = () => {
       setSuccess("");
 
       await addMenu({ food_id: selectedFoodId });
+
       const food = foods.find((f) => f.id === selectedFoodId);
-      setSuccess(`"${food.name}" added to today's menu`);
+
+      setSuccess(`"${food?.name}" added to today's menu`);
+
       setSelectedFoodId(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add menu");
@@ -57,96 +60,123 @@ const AddMenu = () => {
 
   return (
     <div className="container mt-4">
-      <div className="card shadow-lg">
 
-        {/* HEADER */}
-        <div className="card-header bg-success text-white">
-          <h4 className="mb-0"> Add Today’s Menu</h4>
-        </div>
+      {/* CENTER RESPONSIVE CARD */}
+      <div className="row justify-content-center">
 
-        <div className="card-body">
+        <div className="col-12 col-lg-10">
 
-          {error && <div className="alert alert-danger">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
+          <div className="card shadow-lg">
 
-          {/* SEARCH */}
-          <input
-            type="text"
-            className="form-control mb-3"
-            placeholder="Search food by name or category..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+            {/* HEADER */}
+            <div className="card-header bg-success text-white">
+              <h4 className="mb-0">🍽 Add Today’s Menu</h4>
+            </div>
 
-          {/* SCROLLABLE TABLE */}
-          <div style={{ maxHeight: "350px", overflowY: "auto" }}>
-            <table className="table table-hover table-bordered align-middle">
-              <thead className="table-dark sticky-top">
-                <tr>
-                  <th style={{ width: "60px" }}>Select</th>
-                  <th>Food Name</th>
-                  <th>Category</th>
-                  <th>Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredFoods.length === 0 && (
-                  <tr>
-                    <td colSpan="4" className="text-center text-muted">
-                      No food items found
-                    </td>
-                  </tr>
-                )}
+            <div className="card-body">
 
-                {filteredFoods.map((food) => (
-                  <tr key={food.id}>
-                    <td className="text-center">
-                      <input
-                        type="radio"
-                        name="foodSelect"
-                        className="form-check-input"
-                        checked={selectedFoodId === food.id}
-                        onChange={() => setSelectedFoodId(food.id)}
-                      />
-                    </td>
-                    <td>{food.name}</td>
-                    <td>
-                      <span className="badge bg-primary">
-                        {food.category}
-                      </span>
-                    </td>
-                    <td>
-                      {food.is_veg ? (
-                        <span className="badge bg-success">Veg</span>
-                      ) : (
-                        <span className="badge bg-danger">Non-Veg</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              {error && <div className="alert alert-danger">{error}</div>}
+              {success && <div className="alert alert-success">{success}</div>}
+
+              {/* SEARCH */}
+              <input
+                type="text"
+                className="form-control mb-3"
+                placeholder="Search food by name or category..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+
+              {/* RESPONSIVE TABLE WRAPPER */}
+              <div className="table-responsive" style={{ maxHeight: "350px" }}>
+
+                <table className="table table-hover table-bordered align-middle">
+
+                  <thead className="table-dark sticky-top">
+                    <tr>
+                      <th style={{ width: "60px" }}>Select</th>
+                      <th>Food Name</th>
+                      <th>Category</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+
+                    {filteredFoods.length === 0 && (
+                      <tr>
+                        <td colSpan="4" className="text-center text-muted">
+                          No food items found
+                        </td>
+                      </tr>
+                    )}
+
+                    {filteredFoods.map((food) => (
+                      <tr key={food.id}>
+
+                        <td className="text-center">
+                          <input
+                            type="radio"
+                            name="foodSelect"
+                            className="form-check-input"
+                            checked={selectedFoodId === food.id}
+                            onChange={() => setSelectedFoodId(food.id)}
+                          />
+                        </td>
+
+                        <td className="fw-semibold">{food.name}</td>
+
+                        <td>
+                          <span className="badge bg-primary">
+                            {food.category}
+                          </span>
+                        </td>
+
+                        <td>
+                          {food.is_veg ? (
+                            <span className="badge bg-success">Veg</span>
+                          ) : (
+                            <span className="badge bg-danger">Non-Veg</span>
+                          )}
+                        </td>
+
+                      </tr>
+                    ))}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+              {/* BUTTONS (RESPONSIVE STACK ON MOBILE) */}
+              <div className="d-flex flex-column flex-md-row gap-2 justify-content-between mt-4">
+
+                <button
+                  className="btn btn-outline-primary w-100"
+                  onClick={() => navigate("/chef/add-food")}
+                >
+                   Add New Food
+                </button>
+
+                <button
+                  className="btn btn-success w-100"
+                  onClick={handleSubmit}
+                  disabled={loading || !selectedFoodId}
+                >
+                  {loading ? "Saving..." : " Add to Menu"}
+                </button>
+
+              </div>
+
+            </div>
+
           </div>
 
-          {/* ACTION BUTTONS */}
-          <div className="d-flex justify-content-between mt-4">
-            <button
-              className="btn btn-outline-primary"
-              onClick={() => navigate("/chef/add-food")}
-            >
-               Add New Food
-            </button>
-
-            <button
-              className="btn btn-success px-4"
-              onClick={handleSubmit}
-              disabled={loading || !selectedFoodId}
-            >
-              {loading ? "Saving..." : " Add to Menu"}
-            </button>
-          </div>
         </div>
+
       </div>
+
     </div>
   );
 };

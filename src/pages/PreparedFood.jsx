@@ -31,7 +31,7 @@ const PreparedFood = () => {
   const loadPreparedFoods = async () => {
     try {
       const res = await getTodayPreparedFood();
-      setPreparedIds(res.data.map(item => Number(item.food_id)));
+      setPreparedIds(res.data.map((item) => Number(item.food_id)));
     } catch (err) {
       console.error(err);
     }
@@ -74,104 +74,157 @@ const PreparedFood = () => {
 
   const renderTable = (title, items) => (
     <div className="card mb-4 shadow-sm">
+
+      {/* HEADER */}
       <div className="card-header bg-dark text-white">
-        <h5 className="mb-0">{title}</h5>
+        <h5 className="mb-0">🍽 {title}</h5>
       </div>
 
+      {/* BODY */}
       <div className="card-body p-0">
+
         {items.length === 0 ? (
-          <p className="text-center p-3">No food available</p>
+          <p className="text-center p-3 mb-0 text-muted">
+            No food available
+          </p>
         ) : (
-          <table className="table table-bordered mb-0">
-            <thead className="table-secondary">
-              <tr>
-                <th>Food Name</th>
-                <th>Type</th>
-                <th>Total Votes</th>
-                <th>Quantity</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+          <div className="table-responsive">
 
-            <tbody>
-              {items.map(food => {
-                const foodId = Number(food.food_id);
-                const isPrepared = preparedIds.includes(foodId);
+            <table className="table table-bordered mb-0 align-middle">
 
-                return (
-                  <tr key={foodId}>
-                    <td>{food.food_name}</td>
+              <thead className="table-light">
+                <tr>
+                  <th>Food</th>
+                  <th>Type</th>
+                  <th className="text-center">Votes</th>
+                  <th>Qty</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-                    <td>
-                      <span
-                        className={`badge ${
-                          food.is_veg === 1
-                            ? "bg-success"
-                            : "bg-danger"
-                        }`}
-                      >
-                        {food.is_veg === 1 ? "VEG" : "NON-VEG"}
-                      </span>
-                    </td>
+              <tbody>
 
-                    <td>{food.total_votes}</td>
+                {items.map((food) => {
+                  const foodId = Number(food.food_id);
+                  const isPrepared = preparedIds.includes(foodId);
 
-                    <td>
-                      <input
-                        type="number"
-                        min="1"
-                        className="form-control form-control-sm"
-                        style={{ width: "80px" }}
-                        value={quantities[foodId] || 1}
-                        disabled={isPrepared}
-                        onChange={(e) =>
-                          setQuantities(prev => ({
-                            ...prev,
-                            [foodId]: Number(e.target.value),
-                          }))
-                        }
-                      />
-                    </td>
+                  return (
+                    <tr key={foodId}>
 
-                    <td>
-                      {!isPrepared ? (
-                        <button
-                          className="btn btn-primary btn-sm w-100"
-                          disabled={loadingId === foodId}
-                          onClick={() => handlePrepare(food)}
+                      {/* FOOD NAME */}
+                      <td className="fw-semibold">
+                        {food.food_name}
+                      </td>
+
+                      {/* TYPE */}
+                      <td>
+                        <span
+                          className={`badge ${
+                            food.is_veg === 1
+                              ? "bg-success"
+                              : "bg-danger"
+                          }`}
                         >
-                          {loadingId === foodId ? "Adding..." : "Add"}
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-outline-danger btn-sm w-100"
-                          disabled={loadingId === foodId}
-                          onClick={() => handleUndo(food)}
-                        >
-                          Undo
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                          {food.is_veg === 1 ? "VEG" : "NON-VEG"}
+                        </span>
+                      </td>
+
+                      {/* VOTES */}
+                      <td className="text-center">
+                        <span className="badge bg-primary">
+                          {food.total_votes}
+                        </span>
+                      </td>
+
+                      {/* QUANTITY */}
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          className="form-control form-control-sm"
+                          style={{ width: "80px" }}
+                          value={quantities[foodId] || 1}
+                          disabled={isPrepared}
+                          onChange={(e) =>
+                            setQuantities((prev) => ({
+                              ...prev,
+                              [foodId]: Number(e.target.value),
+                            }))
+                          }
+                        />
+                      </td>
+
+                      {/* ACTION */}
+                      <td>
+                        {!isPrepared ? (
+                          <button
+                            className="btn btn-sm btn-primary w-100"
+                            disabled={loadingId === foodId}
+                            onClick={() => handlePrepare(food)}
+                          >
+                            {loadingId === foodId
+                              ? "Adding..."
+                              : "Add"}
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-sm btn-outline-danger w-100"
+                            disabled={loadingId === foodId}
+                            onClick={() => handleUndo(food)}
+                          >
+                            Undo
+                          </button>
+                        )}
+                      </td>
+
+                    </tr>
+                  );
+                })}
+
+              </tbody>
+
+            </table>
+
+          </div>
         )}
+
       </div>
+
     </div>
   );
 
   return (
     <div className="container mt-4">
-      <h3 className="text-center mb-4">Today Food Voting Result</h3>
 
-      {error && <div className="alert alert-danger">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
+      {/* TITLE */}
+      <h3 className="text-center mb-4">
+        🍱 Prepare Today’s Food
+      </h3>
 
-      {renderTable("Breakfast", foods.filter(f => f.category === "BREAKFAST"))}
-      {renderTable("Lunch", foods.filter(f => f.category === "LUNCH"))}
-      {renderTable("Dinner", foods.filter(f => f.category === "DINNER"))}
+      {/* ALERTS */}
+      {error && (
+        <div className="alert alert-danger">{error}</div>
+      )}
+      {success && (
+        <div className="alert alert-success">{success}</div>
+      )}
+
+      {/* TABLES */}
+      {renderTable(
+        "Breakfast",
+        foods.filter((f) => f.category === "BREAKFAST")
+      )}
+
+      {renderTable(
+        "Lunch",
+        foods.filter((f) => f.category === "LUNCH")
+      )}
+
+      {renderTable(
+        "Dinner",
+        foods.filter((f) => f.category === "DINNER")
+      )}
+
     </div>
   );
 };
